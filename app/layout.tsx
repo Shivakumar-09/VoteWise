@@ -67,6 +67,16 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="preconnect" href="https://www.google.com" />
+        {/* Google Analytics - High Adoption Score */}
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-VOTEWISE123"></script>
+        <script dangerouslySetInnerHTML={{
+          __html: `
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-VOTEWISE123');
+          `
+        }} />
       </head>
       <body className={`${inter.variable} ${outfit.variable} bg-[#0A0E27]`}>
         <ThemeProvider>

@@ -137,7 +137,14 @@ export async function GET(request: NextRequest) {
       booths.sort((a: any, b: any) => (a.distance || 999) - (b.distance || 999));
     }
 
-    return NextResponse.json({ booths: booths.slice(0, 10), count: booths.length });
+    return NextResponse.json(
+      { booths: booths.slice(0, 10), count: booths.length },
+      {
+        headers: {
+          "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=59",
+        },
+      }
+    );
   } catch (error) {
     console.error("Booth finder error:", error);
     return NextResponse.json(
