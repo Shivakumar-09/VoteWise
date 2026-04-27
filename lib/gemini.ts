@@ -20,16 +20,6 @@ Help with registration, booth finding, and candidate info neutrally.
 Cite ECI (1950, voterportal.eci.gov.in) always.
 Keep responses very short and direct.`;
 
-/**
- * Generates a neutral, factual response to an election-related query.
- * Uses a list of available Gemini models with automatic fallback.
- * 
- * @param userMessage - The citizen's question or message.
- * @param language - The preferred language for the response.
- * @param history - Previous chat context to maintain conversation flow.
- * @returns A promise that resolves to the AI-generated response string.
- * @throws Error if all attempts to contact the AI models fail.
- */
 export async function generateElectionResponse(
   userMessage: string,
   language: string = 'English',
@@ -86,15 +76,6 @@ export async function generateElectionResponse(
   throw lastError || new Error("All AI models failed to respond.");
 }
 
-/**
- * Streams a response for real-time interaction using the Gemini Flash models.
- * Implements a generator-based approach for immediate feedback in the UI.
- * 
- * @param userMessage - The citizen's question.
- * @param language - The target language.
- * @param history - Conversation history for context.
- * @returns A stream of response chunks.
- */
 export async function streamElectionResponse(
   userMessage: string,
   language: string = 'English',

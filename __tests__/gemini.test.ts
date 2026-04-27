@@ -1,6 +1,6 @@
 
 import { describe, it, expect, vi } from 'vitest';
-import { generateElectionResponse } from '@/lib/gemini';
+import { generateElectionResponse } from './gemini';
 
 process.env.GEMINI_API_KEY = 'mock-key';
 
