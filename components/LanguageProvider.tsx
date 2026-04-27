@@ -23,6 +23,8 @@ const langMap: Record<Language, string> = {
   Urdu: "ur",
 };
 
+import { allTranslations } from "@/lib/translations";
+
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [language, setLanguageState] = useState<Language>("English");
   const [translations, setTranslations] = useState<any>({});
@@ -43,37 +45,9 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    // Fetch translations
-    const loadTranslations = async () => {
-      try {
-        const res = await fetch(`/locales/${langMap[language]}.json`);
-        
-        if (!res.ok) throw new Error(`Status ${res.status}`);
-        const contentType = res.headers.get("content-type");
-        if (!contentType || !contentType.includes("application/json")) {
-          throw new Error("Not JSON");
-        }
-
-        const data = await res.json();
-        setTranslations(data);
-      } catch (error) {
-        console.error("Failed to load translations:", error);
-        
-        // Try fallback to English if not already English
-        if (language !== "English") {
-          try {
-            const res = await fetch("/locales/en.json");
-            if (res.ok) {
-              const data = await res.json();
-              setTranslations(data);
-            }
-          } catch (e) {
-            console.error("English fallback failed too", e);
-          }
-        }
-      }
-    };
-    loadTranslations();
+    const langCode = langMap[language];
+    const data = (allTranslations as any)[langCode] || (allTranslations as any)["en"];
+    setTranslations(data);
     localStorage.setItem("votewise-lang", language);
   }, [language]);
 

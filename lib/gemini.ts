@@ -67,30 +67,45 @@ export async function generateElectionResponse(
   language: string = 'English',
   history: Array<{ role: string; content: string }> = []
 ): Promise<string> {
-  const model = getGeminiModel();
-  
-  const langInstruction = `\n\nIMPORTANT: The user is communicating in ${language}. Respond entirely in ${language}.`;
+  // Models to try in order of preference
+  const modelsToTry = ['gemini-flash-latest', 'gemini-1.5-flash', 'gemini-2.0-flash'];
+  let lastError = null;
 
-  const safeHistory: any[] = [];
-  let expectedRole = 'user';
-  for (const h of history) {
-    const mappedRole = h.role === 'user' ? 'user' : 'model';
-    if (mappedRole === expectedRole) {
-      safeHistory.push({ role: mappedRole, parts: [{ text: h.content }] });
-      expectedRole = expectedRole === 'user' ? 'model' : 'user';
+  for (const modelName of modelsToTry) {
+    try {
+      const model = getGenAI().getGenerativeModel({
+        model: modelName,
+        safetySettings: [
+          { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
+          { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
+          { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
+          { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
+        ],
+      });
+      
+      const langInstruction = `\n\nIMPORTANT: The user is communicating in ${language}. Respond entirely in ${language}.`;
+
+      const chat = model.startChat({
+        history: [
+          { role: 'user', parts: [{ text: ELECTION_SYSTEM_PROMPT }] },
+          { role: 'model', parts: [{ text: "Understood. I will act as VoteWise AI and assist citizens in their preferred language." }] },
+          ...history.map(h => ({
+            role: h.role === 'user' ? 'user' as const : 'model' as const,
+            parts: [{ text: h.content }]
+          }))
+        ]
+      });
+
+      const result = await chat.sendMessage(`${userMessage}${langInstruction}`);
+      return result.response.text();
+    } catch (err: any) {
+      console.error(`Gemini attempt with ${modelName} failed:`, err.message);
+      lastError = err;
+      // Continue to next model
     }
   }
 
-  const chat = model.startChat({
-    history: [
-      { role: 'user', parts: [{ text: ELECTION_SYSTEM_PROMPT }] },
-      { role: 'model', parts: [{ text: "Understood. I will act as VoteWise AI and assist citizens in their preferred language." }] },
-      ...safeHistory
-    ]
-  });
-
-  const result = await chat.sendMessage(`${userMessage}${langInstruction}`);
-  return result.response.text();
+  throw lastError || new Error("All AI models failed to respond.");
 }
 
 export async function analyzeFakeNews(content: string): Promise<{
