@@ -23,11 +23,22 @@ const langMap: Record<Language, string> = {
   Urdu: "ur",
 };
 
-import { allTranslations } from "@/lib/translations";
+import en from "../public/locales/en.json";
+import hi from "../public/locales/hi.json";
+import te from "../public/locales/te.json";
+import ta from "../public/locales/ta.json";
+import kn from "../public/locales/kn.json";
+import mr from "../public/locales/mr.json";
+import bn from "../public/locales/bn.json";
+import ur from "../public/locales/ur.json";
+
+const allTranslations: Record<string, any> = {
+  en, hi, te, ta, kn, mr, bn, ur
+};
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [language, setLanguageState] = useState<Language>("English");
-  const [translations, setTranslations] = useState<any>({});
+  const [translations, setTranslations] = useState<any>(en);
 
   useEffect(() => {
     // Load from localStorage
@@ -46,7 +57,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const langCode = langMap[language];
-    const data = (allTranslations as any)[langCode] || (allTranslations as any)["en"];
+    const data = allTranslations[langCode] || en;
     setTranslations(data);
     localStorage.setItem("votewise-lang", language);
   }, [language]);
