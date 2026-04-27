@@ -62,11 +62,22 @@ export async function generateElectionResponse(
 
       const langInstruction = `\n\nIMPORTANT: The user is communicating in ${language}. Respond entirely in ${language}.`;
 
+      // Ensure history starts with a 'user' message and alternates roles correctly
+      let processedHistory = history.map(h => ({
+        role: h.role === 'user' ? 'user' as const : 'model' as const,
+        parts: [{ text: h.content }]
+      }));
+
+      // Find the first user message
+      const firstUserIndex = processedHistory.findIndex(h => h.role === 'user');
+      if (firstUserIndex !== -1) {
+        processedHistory = processedHistory.slice(firstUserIndex);
+      } else {
+        processedHistory = [];
+      }
+
       const chat = model.startChat({
-        history: history.map(h => ({
-          role: h.role === 'user' ? 'user' as const : 'model' as const,
-          parts: [{ text: h.content }]
-        }))
+        history: processedHistory
       });
 
       const result = await chat.sendMessage(`${userMessage}${langInstruction}`);
