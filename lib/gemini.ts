@@ -13,32 +13,12 @@ function getGenAI() {
   return genAI;
 }
 
-const MODELS_TO_TRY = ['gemini-3-flash-preview', 'gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-flash-latest'];
+const MODELS_TO_TRY = ['gemini-1.5-flash-8b', 'gemini-1.5-flash', 'gemini-flash-latest'];
 
-export const ELECTION_SYSTEM_PROMPT = `You are VoteWise AI, an expert multilingual election assistance chatbot for Indian citizens.
-
-Your role:
-- Help citizens understand how Indian elections work (Lok Sabha, Rajya Sabha, State Assemblies, local bodies)
-- Explain voter registration processes clearly
-- Guide people on how to find their polling booth
-- Explain candidate eligibility and disqualification rules
-- Clarify voting procedures and EVM usage
-- Explain Model Code of Conduct
-- Help people understand their democratic rights
-- Detect and correct election-related misinformation
-
-Rules:
-- Always be factual, neutral, and non-partisan
-- Never recommend or favor any political party or candidate
-- Cite official sources like ECI (Election Commission of India), Voter Helpline 1950
-- Respond in the language requested by the user
-- Keep responses concise but comprehensive
-- Always end with "Need more help? Call National Voter Helpline: 1950"
-
-Official contacts:
-- National Voter Helpline: 1950
-- ECI Website: https://www.eci.gov.in
-- Voter Portal: https://voterportal.eci.gov.in`;
+export const ELECTION_SYSTEM_PROMPT = `You are VoteWise AI, a fast multilingual election assistant for India.
+Help with registration, booth finding, and candidate info neutrally.
+Cite ECI (1950, voterportal.eci.gov.in) always.
+Keep responses very short and direct.`;
 
 export async function generateElectionResponse(
   userMessage: string,
@@ -53,11 +33,15 @@ export async function generateElectionResponse(
         model: modelName,
         systemInstruction: ELECTION_SYSTEM_PROMPT,
         safetySettings: [
-          { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
-          { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
-          { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
-          { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
+          { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
+          { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
+          { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_NONE },
+          { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_NONE },
         ],
+        generationConfig: {
+          maxOutputTokens: 500,
+          temperature: 0.1,
+        },
       });
 
       const langInstruction = `\n\nIMPORTANT: The user is communicating in ${language}. Respond entirely in ${language}.`;
@@ -105,11 +89,15 @@ export async function streamElectionResponse(
         model: modelName,
         systemInstruction: ELECTION_SYSTEM_PROMPT,
         safetySettings: [
-          { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
-          { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
-          { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
-          { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
+          { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
+          { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
+          { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_NONE },
+          { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_NONE },
         ],
+        generationConfig: {
+          maxOutputTokens: 500,
+          temperature: 0.1,
+        },
       });
 
       const langInstruction = `\n\nIMPORTANT: The user is communicating in ${language}. Respond entirely in ${language}.`;
