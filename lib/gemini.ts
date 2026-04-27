@@ -13,8 +13,7 @@ function getGenAI() {
   return genAI;
 }
 
-// Models to try in order of preference if one is down (503)
-const MODELS_TO_TRY = ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-flash-latest'];
+const MODELS_TO_TRY = ['gemini-3-flash-preview', 'gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-flash-latest'];
 
 export const ELECTION_SYSTEM_PROMPT = `You are VoteWise AI, an expert multilingual election assistance chatbot for Indian citizens.
 
@@ -60,7 +59,7 @@ export async function generateElectionResponse(
           { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
         ],
       });
-      
+
       const langInstruction = `\n\nIMPORTANT: The user is communicating in ${language}. Respond entirely in ${language}.`;
 
       const chat = model.startChat({
@@ -93,7 +92,7 @@ export async function analyzeFakeNews(content: string): Promise<{
   for (const modelName of MODELS_TO_TRY) {
     try {
       const model = getGenAI().getGenerativeModel({ model: modelName });
-      
+
       const prompt = `You are a fact-checker specializing in Indian election news. Analyze the following content for misinformation.
 
 Content to analyze:

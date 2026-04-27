@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
       {
         error:
           "Failed to get AI response. Please try again or call Voter Helpline: 1950",
-        details: process.env.NODE_ENV === 'development' ? error.message : undefined
+        details: error.message
       },
       { status: 500 }
     );
