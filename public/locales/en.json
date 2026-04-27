@@ -65,6 +65,10 @@
     "help_telangana": "Telangana Election Office",
     "help_nearby": "Try nearby areas"
   },
+  "ai_assistant": {
+    "welcome_message": "Hello! I am VoteWise AI. I can help you understand the election process, check your eligibility, find polling booths, and verify news. How can I assist you today?",
+    "fallback_message": "Sorry, I am experiencing high traffic right now. Please try again in a moment, or call the National Voter Helpline at 1950."
+  },
   "eligibility": {
     "title": "Check Your Eligibility",
     "age_label": "Your Age",

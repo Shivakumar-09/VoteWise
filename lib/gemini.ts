@@ -15,7 +15,7 @@ function getGenAI() {
 
 export function getGeminiModel() {
   return getGenAI().getGenerativeModel({
-    model: 'gemini-1.5-flash',
+    model: 'gemini-flash-latest',
     safetySettings: [
       {
         category: HarmCategory.HARM_CATEGORY_HARASSMENT,
@@ -71,14 +71,21 @@ export async function generateElectionResponse(
   
   const langInstruction = `\n\nIMPORTANT: The user is communicating in ${language}. Respond entirely in ${language}.`;
 
+  const safeHistory: any[] = [];
+  let expectedRole = 'user';
+  for (const h of history) {
+    const mappedRole = h.role === 'user' ? 'user' : 'model';
+    if (mappedRole === expectedRole) {
+      safeHistory.push({ role: mappedRole, parts: [{ text: h.content }] });
+      expectedRole = expectedRole === 'user' ? 'model' : 'user';
+    }
+  }
+
   const chat = model.startChat({
     history: [
       { role: 'user', parts: [{ text: ELECTION_SYSTEM_PROMPT }] },
       { role: 'model', parts: [{ text: "Understood. I will act as VoteWise AI and assist citizens in their preferred language." }] },
-      ...history.map(h => ({
-        role: h.role === 'user' ? 'user' as const : 'model' as const,
-        parts: [{ text: h.content }]
-      }))
+      ...safeHistory
     ]
   });
 
