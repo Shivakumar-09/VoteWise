@@ -98,5 +98,22 @@
   "guides": {
     "registration": "Registration Guide",
     "accessibility": "Accessibility Mode"
+  },
+  "homepage": {
+    "stats": {
+      "states": "States & UTs Covered",
+      "constituencies": "Constituencies",
+      "languages": "Languages Supported",
+      "accuracy": "AI Accuracy"
+    },
+    "features_title": "Everything You Need To",
+    "features_gradient": "Vote Smart",
+    "features_subtitle": "Comprehensive digital tools to simplify the largest democratic exercise in the world.",
+    "explore_all": "Explore All Tools",
+    "cta_title": "Be a",
+    "cta_gradient": "Wise Voter",
+    "cta_subtitle": "Join thousands of Indian citizens using AI to understand their democratic rights and participate in building the nation.",
+    "launch_btn": "Launch Assistant",
+    "read_guides": "Read Guides"
   }
 }

@@ -173,10 +173,10 @@ export default function HomePage() {
             className="mt-20 grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto border-t border-foreground/5 pt-12"
           >
             {[
-              { label: "States & UTs Covered", value: 36, suffix: "" },
-              { label: "Constituencies", value: 543, suffix: "" },
-              { label: "Languages Supported", value: 8, suffix: "" },
-              { label: "AI Accuracy", value: 98, suffix: "%" },
+              { label: t("homepage.stats.states"), value: 36, suffix: "" },
+              { label: t("homepage.stats.constituencies"), value: 543, suffix: "" },
+              { label: t("homepage.stats.languages"), value: 8, suffix: "" },
+              { label: t("homepage.stats.accuracy"), value: 98, suffix: "%" },
             ].map((stat) => (
               <div key={stat.label}>
                 <p className="text-3xl md:text-4xl font-heading font-bold text-foreground mb-1">
@@ -195,14 +195,14 @@ export default function HomePage() {
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
             <div className="max-w-2xl">
               <h2 className="text-4xl md:text-5xl font-heading font-bold text-foreground mb-4">
-                Everything You Need <br /> To <span className="gradient-text">Vote Smart</span>
+                {t("homepage.features_title")} <br /> {t("homepage.cta_title").toLowerCase() === "be a" ? "To" : ""} <span className="gradient-text">{t("homepage.features_gradient")}</span>
               </h2>
               <p className="text-foreground/40 text-lg">
-                Comprehensive digital tools to simplify the largest democratic exercise in the world.
+                {t("homepage.features_subtitle")}
               </p>
             </div>
             <Link href="/ai-assistant" className="group flex items-center gap-2 text-indigo-400 font-bold hover:text-foreground transition-colors">
-              Explore All Tools <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              {t("homepage.explore_all")} <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
 
@@ -232,7 +232,7 @@ export default function HomePage() {
                     <p className="text-foreground/40 text-sm leading-relaxed mb-6 flex-1">{f.desc}</p>
                     
                     <div className="flex items-center gap-2 text-indigo-400 text-xs font-bold uppercase tracking-wider opacity-0 group-hover:opacity-100 transition-opacity">
-                      Try Now <ChevronRight className="w-3.5 h-3.5" />
+                      {t("common.retry") === "Retry" ? "Try Now" : t("common.retry")} <ChevronRight className="w-3.5 h-3.5" />
                     </div>
                   </div>
                 </Link>
@@ -251,18 +251,18 @@ export default function HomePage() {
             <div className="absolute -top-12 -right-12 w-48 h-48 bg-indigo-500/20 rounded-full blur-3xl" />
             
             <h2 className="text-4xl md:text-5xl font-heading font-bold text-foreground mb-6">
-              Be a <span className="gradient-text">Wise Voter</span> Today
+              {t("homepage.cta_title")} <span className="gradient-text">{t("homepage.cta_gradient")}</span> {t("homepage.cta_title").toLowerCase() === "be a" ? "Today" : ""}
             </h2>
             <p className="text-foreground/50 text-lg mb-10 max-w-2xl mx-auto">
-              Join thousands of Indian citizens using AI to understand their democratic rights and participate in building the nation.
+              {t("homepage.cta_subtitle")}
             </p>
             
             <div className="flex flex-wrap justify-center gap-4">
                <Link href="/ai-assistant" className="btn-primary px-10 py-4 rounded-2xl shadow-glow">
-                 Launch Assistant
+                 {t("homepage.launch_btn")}
                </Link>
                <button className="px-10 py-4 rounded-2xl bg-foreground/5 border border-foreground/10 text-foreground font-bold hover:bg-foreground/10 transition-all">
-                 Read Guides
+                 {t("homepage.read_guides")}
                </button>
             </div>
           </div>
