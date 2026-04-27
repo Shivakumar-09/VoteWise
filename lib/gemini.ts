@@ -52,6 +52,7 @@ export async function generateElectionResponse(
     try {
       const model = getGenAI().getGenerativeModel({
         model: modelName,
+        systemInstruction: ELECTION_SYSTEM_PROMPT,
         safetySettings: [
           { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
           { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
@@ -63,14 +64,10 @@ export async function generateElectionResponse(
       const langInstruction = `\n\nIMPORTANT: The user is communicating in ${language}. Respond entirely in ${language}.`;
 
       const chat = model.startChat({
-        history: [
-          { role: 'user', parts: [{ text: ELECTION_SYSTEM_PROMPT }] },
-          { role: 'model', parts: [{ text: "Understood. I will act as VoteWise AI and assist citizens in their preferred language." }] },
-          ...history.map(h => ({
-            role: h.role === 'user' ? 'user' as const : 'model' as const,
-            parts: [{ text: h.content }]
-          }))
-        ]
+        history: history.map(h => ({
+          role: h.role === 'user' ? 'user' as const : 'model' as const,
+          parts: [{ text: h.content }]
+        }))
       });
 
       const result = await chat.sendMessage(`${userMessage}${langInstruction}`);
