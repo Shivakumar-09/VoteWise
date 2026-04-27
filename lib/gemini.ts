@@ -13,29 +13,8 @@ function getGenAI() {
   return genAI;
 }
 
-export function getGeminiModel() {
-  return getGenAI().getGenerativeModel({
-    model: 'gemini-flash-latest',
-    safetySettings: [
-      {
-        category: HarmCategory.HARM_CATEGORY_HARASSMENT,
-        threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-      },
-      {
-        category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
-        threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-      },
-      {
-        category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
-        threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-      },
-      {
-        category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
-        threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-      },
-    ],
-  });
-}
+// Models to try in order of preference if one is down (503)
+const MODELS_TO_TRY = ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-flash-latest'];
 
 export const ELECTION_SYSTEM_PROMPT = `You are VoteWise AI, an expert multilingual election assistance chatbot for Indian citizens.
 
@@ -67,11 +46,9 @@ export async function generateElectionResponse(
   language: string = 'English',
   history: Array<{ role: string; content: string }> = []
 ): Promise<string> {
-  // Models to try in order of preference
-  const modelsToTry = ['gemini-flash-latest', 'gemini-1.5-flash', 'gemini-2.0-flash'];
   let lastError = null;
 
-  for (const modelName of modelsToTry) {
+  for (const modelName of MODELS_TO_TRY) {
     try {
       const model = getGenAI().getGenerativeModel({
         model: modelName,
@@ -99,9 +76,8 @@ export async function generateElectionResponse(
       const result = await chat.sendMessage(`${userMessage}${langInstruction}`);
       return result.response.text();
     } catch (err: any) {
-      console.error(`Gemini attempt with ${modelName} failed:`, err.message);
+      console.error(`Gemini Chat attempt with ${modelName} failed:`, err.message);
       lastError = err;
-      // Continue to next model
     }
   }
 
@@ -115,9 +91,13 @@ export async function analyzeFakeNews(content: string): Promise<{
   redFlags: string[]
   officialSources: string[]
 }> {
-  const model = getGeminiModel();
-  
-  const prompt = `You are a fact-checker specializing in Indian election news. Analyze the following content for misinformation.
+  let lastError = null;
+
+  for (const modelName of MODELS_TO_TRY) {
+    try {
+      const model = getGenAI().getGenerativeModel({ model: modelName });
+      
+      const prompt = `You are a fact-checker specializing in Indian election news. Analyze the following content for misinformation.
 
 Content to analyze:
 "${content}"
@@ -133,19 +113,25 @@ Respond ONLY with a valid JSON object in this exact format:
 
 Be objective, cite official Indian government sources (ECI, PIB, etc.), and be concise.`;
 
-  const result = await model.generateContent(prompt);
-  const text = result.response.text();
+      const result = await model.generateContent(prompt);
+      const text = result.response.text();
 
-  const jsonMatch = text.match(/\{[\s\S]*\}/);
-  if (jsonMatch) {
-    return JSON.parse(jsonMatch[0]);
+      const jsonMatch = text.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        return JSON.parse(jsonMatch[0]);
+      }
+      throw new Error("Invalid JSON response from AI");
+    } catch (err: any) {
+      console.error(`Gemini Fake News attempt with ${modelName} failed:`, err.message);
+      lastError = err;
+    }
   }
 
   return {
     verdict: 'UNVERIFIED',
     confidence: 50,
-    explanation: 'Unable to fully analyze the content. Please check official ECI sources.',
-    redFlags: [],
+    explanation: 'AI analysis service is currently under high load. Please check official ECI sources manually.',
+    redFlags: ['Service high demand'],
     officialSources: ['https://www.eci.gov.in', 'https://pib.gov.in'],
   };
 }
