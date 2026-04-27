@@ -92,6 +92,56 @@ export async function generateElectionResponse(
   throw lastError || new Error("All AI models failed to respond.");
 }
 
+export async function streamElectionResponse(
+  userMessage: string,
+  language: string = 'English',
+  history: Array<{ role: string; content: string }> = []
+) {
+  let lastError = null;
+
+  for (const modelName of MODELS_TO_TRY) {
+    try {
+      const model = getGenAI().getGenerativeModel({
+        model: modelName,
+        systemInstruction: ELECTION_SYSTEM_PROMPT,
+        safetySettings: [
+          { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
+          { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
+          { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
+          { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
+        ],
+      });
+
+      const langInstruction = `\n\nIMPORTANT: The user is communicating in ${language}. Respond entirely in ${language}.`;
+
+      let processedHistory = history.map(h => ({
+        role: h.role === 'user' ? 'user' as const : 'model' as const,
+        parts: [{ text: h.content }]
+      }));
+
+      const firstUserIndex = processedHistory.findIndex(h => h.role === 'user');
+      if (firstUserIndex !== -1) {
+        processedHistory = processedHistory.slice(firstUserIndex);
+      } else {
+        processedHistory = [];
+      }
+
+      const chat = model.startChat({
+        history: processedHistory
+      });
+
+      const result = await chat.sendMessageStream(`${userMessage}${langInstruction}`);
+      return result.stream;
+    } catch (err: any) {
+      console.error(`Gemini Streaming attempt with ${modelName} failed:`, err.message);
+      lastError = err;
+    }
+  }
+
+  throw lastError || new Error("All AI models failed to respond.");
+}
+
+
 export async function analyzeFakeNews(content: string): Promise<{
   verdict: 'LIKELY_TRUE' | 'UNVERIFIED' | 'LIKELY_FALSE' | 'MISLEADING'
   confidence: number

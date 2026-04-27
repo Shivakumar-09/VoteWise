@@ -86,22 +86,46 @@ export default function AIAssistantPage() {
         body: JSON.stringify({ message: messageText, language, history }),
       });
 
-      const data = await res.json();
-      console.log("AI Chat raw response:", data);
-      
-      if (data.error) {
-        throw new Error(data.error + (data.details ? " Details: " + data.details : ""));
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error + (errorData.details ? " Details: " + errorData.details : ""));
       }
 
-      const aiMsg: Message = {
-        role: "ai",
-        content: data.response || "Sorry, I couldn't process that.",
-        timestamp: new Date(),
-      };
-      setMessages((prev) => [...prev, aiMsg]);
+      const reader = res.body?.getReader();
+      const decoder = new TextDecoder();
+      let aiContent = "";
 
-      if (ttsEnabled) {
-        speakText(aiMsg.content);
+      // Add an initial empty AI message
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "ai",
+          content: "",
+          timestamp: new Date(),
+        },
+      ]);
+
+      if (reader) {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          const chunk = decoder.decode(value, { stream: true });
+          aiContent += chunk;
+
+          // Update the last message (the AI response) with the accumulated content
+          setMessages((prev) => {
+            const newMessages = [...prev];
+            const lastMessage = { ...newMessages[newMessages.length - 1] };
+            lastMessage.content = aiContent;
+            newMessages[newMessages.length - 1] = lastMessage;
+            return newMessages;
+          });
+        }
+      }
+
+      if (ttsEnabled && aiContent) {
+        speakText(aiContent);
       }
     } catch (err: any) {
       console.error("Chat Error:", err);

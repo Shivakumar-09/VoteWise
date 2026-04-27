@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { generateElectionResponse } from "@/lib/gemini";
+import { streamElectionResponse } from "@/lib/gemini";
 
 export const runtime = "nodejs";
 
@@ -15,38 +15,48 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (message.length > 2000) {
-      return NextResponse.json(
-        { error: "Message too long (max 2000 characters)" },
-        { status: 400 }
-      );
-    }
-
     if (!process.env.GEMINI_API_KEY) {
       return NextResponse.json(
-        {
-          response:
-            "AI service is not configured. Please add your GEMINI_API_KEY to the environment variables. In the meantime, you can call the National Voter Helpline at 1950 for assistance.",
-        },
+        { response: "AI service is not configured." },
         { status: 200 }
       );
     }
 
-    const response = await generateElectionResponse(
+    const stream = await streamElectionResponse(
       message.trim(),
       language,
-      history.slice(-6) // Keep last 6 messages for context
+      history.slice(-6)
     );
 
-    return NextResponse.json({ response });
-    } catch (error: any) {
+    const encoder = new TextEncoder();
+    const readableStream = new ReadableStream({
+      async start(controller) {
+        try {
+          for await (const chunk of stream) {
+            const chunkText = chunk.text();
+            if (chunkText) {
+              controller.enqueue(encoder.encode(chunkText));
+            }
+          }
+        } catch (error: any) {
+          console.error("Stream error:", error);
+          controller.error(error);
+        } finally {
+          controller.close();
+        }
+      },
+    });
+
+    return new Response(readableStream, {
+      headers: {
+        "Content-Type": "text/plain; charset=utf-8",
+      },
+    });
+  } catch (error: any) {
     console.error("AI Chat error [POST /api/ai-chat]:", error.message || error);
-    if (error.stack) console.error(error.stack);
-    
     return NextResponse.json(
       {
-        error:
-          "Failed to get AI response. Please try again or call Voter Helpline: 1950",
+        error: "Failed to get AI response.",
         details: error.message
       },
       { status: 500 }
