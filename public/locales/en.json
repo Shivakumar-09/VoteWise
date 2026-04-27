@@ -1,0 +1,102 @@
+{
+  "navbar": {
+    "tools": "Tools",
+    "elections": "Elections",
+    "guides": "Guides",
+    "ask_ai": "Ask AI",
+    "home": "Home"
+  },
+  "hero": {
+    "badge": "India's #1 Multilingual Election Platform",
+    "title_part1": "Democracy Should Be",
+    "title_gradient": "Understood",
+    "title_part2": "in Every Language",
+    "subtitle": "AI-powered election assistance for every Indian citizen. Check eligibility, find booths, compare candidates, detect fake news — in your language.",
+    "cta_ai": "Ask AI Assistant",
+    "cta_eligibility": "Check Eligibility",
+    "cta_booth": "Find My Booth"
+  },
+  "ai_assistant": {
+    "title": "AI Election Assistant",
+    "subtitle": "Powered by Google Gemini · 8 languages",
+    "placeholder": "Ask about elections in {language}...",
+    "clear_chat": "Clear chat",
+    "voice_input": "Voice input",
+    "stop_listening": "Stop listening",
+    "tts_toggle": "Text-to-speech",
+    "suggested_prompts": [
+      "How do I register to vote?",
+      "What documents do I need for Voter ID?",
+      "How to find my polling booth?",
+      "What is NOTA?"
+    ],
+    "fallback_message": "Failed to get AI response. Please try again or call Voter Helpline: 1950",
+    "welcome_message": "👋 Namaste! I'm **VoteWise AI**, your multilingual election assistant.\n\nI can help you with voter registration, finding your booth, understanding candidates, checking eligibility, and much more — in your preferred language.\n\nWhat would you like to know today? 🗳️"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "retry": "Retry",
+    "call_helpline": "Need direct help? Call National Voter Helpline: 1950"
+  },
+  "sidebar": {
+    "tools": "Tools",
+    "election_guide": "Election Guide",
+    "booth_finder": "Booth Finder",
+    "eligibility": "Eligibility",
+    "fake_news": "Fake News",
+    "ai_assistant": "AI Assistant",
+    "home": "Home"
+  },
+  "booth": {
+    "state": "State",
+    "district": "District",
+    "pincode": "PIN Code",
+    "search_btn": "Search Location",
+    "use_my_location": "Use My Location",
+    "search_placeholder": "Enter your city, area or PIN code...",
+    "found": "Found",
+    "results_text": "polling booths",
+    "distance": "Distance",
+    "travel_time": "Est. Travel Time",
+    "get_directions": "Get Directions",
+    "call_support": "Call Support",
+    "help_section_title": "Need Assistance?",
+    "help_telangana": "Telangana Election Office",
+    "help_nearby": "Try nearby areas"
+  },
+  "eligibility": {
+    "title": "Check Your Eligibility",
+    "age_label": "Your Age",
+    "age_hint": "Must be 18+ to vote in Indian elections",
+    "citizenship_label": "Citizenship Status",
+    "citizen_indian": "Indian Citizen",
+    "residency_label": "Time at Current Address",
+    "success_title": "You are Eligible to Vote!",
+    "success_desc": "Great news! You meet all the basic requirements.",
+    "fail_title": "Not Currently Eligible",
+    "fail_desc": "Based on the information provided, you do not meet all criteria."
+  },
+  "fake_news": {
+    "title": "Fake News Detector",
+    "placeholder": "Paste election news, claim, or WhatsApp message here...",
+    "analyze_btn": "Analyze This Content",
+    "verdict_true": "Likely True",
+    "verdict_unverified": "Unverified",
+    "verdict_false": "Likely False",
+    "verdict_misleading": "Misleading",
+    "confidence": "Confidence",
+    "red_flags": "Red Flags Detected",
+    "verify_sources": "Official Sources to Verify",
+    "error_too_short": "Please enter at least 20 characters to analyze.",
+    "samples": [
+      "The election dates have been changed due to a court order. Voting will now happen on a different date.",
+      "EVMs can be hacked using a Bluetooth device and all votes can be changed remotely.",
+      "The Election Commission of India has announced that Aadhaar card is now the only valid ID for voting."
+    ]
+  },
+  "guides": {
+    "registration": "Registration Guide",
+    "accessibility": "Accessibility Mode"
+  }
+}

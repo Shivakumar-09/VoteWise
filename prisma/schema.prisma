@@ -1,0 +1,134 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Election {
+  id          String      @id @default(cuid())
+  title       String
+  type        ElectionType
+  state       String?     // null for national
+  phase       String?
+  pollingDate DateTime
+  resultDate  DateTime?
+  deadline    DateTime?   // registration deadline
+  status      ElectionStatus @default(UPCOMING)
+  description String?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  candidates  Candidate[]
+  reminders   Reminder[]
+
+  @@map("elections")
+}
+
+model Candidate {
+  id              String   @id @default(cuid())
+  name            String
+  party           String
+  partyShort      String?
+  symbol          String?  // party symbol emoji or text
+  constituency    String
+  state           String
+  education       String?
+  assets          String?  // declared assets in INR
+  liabilities     String?
+  criminalCases   Int      @default(0)
+  experience      String?  // years or description
+  age             Int?
+  gender          String?
+  electionId      String
+  election        Election @relation(fields: [electionId], references: [id])
+  createdAt       DateTime @default(now())
+
+  @@map("candidates")
+}
+
+model PollingBooth {
+  id            String   @id @default(cuid())
+  boothCode     String   @unique
+  name          String
+  address       String
+  state         String
+  district      String
+  city          String?
+  area          String?
+  pincode       String
+  contactNumber String?
+  timing        String   @default("7:00 AM - 6:00 PM")
+  latitude      Float?
+  longitude     Float?
+  createdAt     DateTime @default(now())
+
+  @@index([state, district])
+  @@index([pincode])
+  @@index([city, area])
+  @@map("polling_booths")
+}
+
+model Reminder {
+  id           String   @id @default(cuid())
+  email        String
+  name         String?
+  electionId   String
+  election     Election @relation(fields: [electionId], references: [id])
+  reminderDate DateTime
+  sent         Boolean  @default(false)
+  createdAt    DateTime @default(now())
+
+  @@map("reminders")
+}
+
+model SupportRequest {
+  id          String        @id @default(cuid())
+  name        String
+  email       String
+  phone       String?
+  state       String
+  issue       String
+  description String
+  status      SupportStatus @default(OPEN)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@map("support_requests")
+}
+
+model Feedback {
+  id        String   @id @default(cuid())
+  rating    Int      // 1-5
+  comment   String?
+  page      String?
+  createdAt DateTime @default(now())
+
+  @@map("feedback")
+}
+
+enum ElectionType {
+  GENERAL
+  STATE_ASSEMBLY
+  LOCAL_BODY
+  BY_ELECTION
+  RAJYA_SABHA
+}
+
+enum ElectionStatus {
+  UPCOMING
+  ONGOING
+  COMPLETED
+  POSTPONED
+}
+
+enum SupportStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
