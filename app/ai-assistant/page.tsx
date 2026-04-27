@@ -87,9 +87,10 @@ export default function AIAssistantPage() {
       });
 
       const data = await res.json();
+      console.log("AI Chat raw response:", data);
       
       if (data.error) {
-        throw new Error(data.error);
+        throw new Error(data.error + (data.details ? " Details: " + data.details : ""));
       }
 
       const aiMsg: Message = {

@@ -77,6 +77,7 @@ export async function generateElectionResponse(
     }
   }
 
+  console.error("All AI models failed. Final error:", lastError?.message || lastError);
   throw lastError || new Error("All AI models failed to respond.");
 }
 
